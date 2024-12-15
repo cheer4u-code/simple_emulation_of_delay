@@ -1,0 +1,52 @@
+name: test
+services:
+  host1:
+    image: alpine
+    hostname: host1
+    container_name: host1
+    networks:
+        link1:
+          ipv4_address: 192.168.1.2
+    entrypoint: sleep infinity
+  host2:
+    image: alpine
+    depends_on:
+      - host1
+    hostname: host2
+    container_name: host2
+    networks:
+        link2:
+          ipv4_address: 192.168.2.2
+    entrypoint: sleep infinity
+  router:
+    image: alpine
+    depends_on:
+      - host1
+    hostname: router
+    container_name: router
+    networks:
+        link1:
+          ipv4_address: 192.168.1.1
+        link2:
+          ipv4_address: 192.168.2.1
+    entrypoint: sleep infinity
+
+networks:
+  link1:
+    name: link1
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: link1
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
+          gateway: 192.168.1.254
+  link2:
+    name: link2
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: link2
+    ipam:
+      config:
+        - subnet: 192.168.2.0/24
+          gateway: 192.168.2.254
